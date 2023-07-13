@@ -30,7 +30,7 @@ sayMyName = knight(sayMyName_original)
 
 # Let's see it working:
 myName = sayMyName("Jon", "Arbuckle")
-print(f"My name is {myName}")
+print(f"My name is {myName}.")
 print()
 
 # However, there's a more common way to apply decorators that uses a special syntax.
@@ -45,7 +45,7 @@ def sayYourName(firstName, lastName):
 
 # Let's see it working:
 yourName = sayYourName("Jon", "Arbuckle")
-print(f"Your name is {yourName}")
+print(f"Your name is {yourName}.")
 
 
 print('\n')
@@ -76,14 +76,20 @@ print( bodyText("Heyo!") )
 
 print('\n')
 ############################# SOME NOTES #################################
-
+#
 #	The order that multiple decorators are applied can matter.
 #	Each decorator adds an additional function call to calling a function;
 # 		consider that for both your stack and your speed.
 
+
 ############################# SOME PRACTICAL EXAMPLES #################################
 
+TEST_MODE = True
+
 def testSpeed(myFunction):
+	if not TEST_MODE:
+		return myFunction
+
 	import time
 	@wraps(myFunction)
 	def wrapper(*args, **kwargs):
@@ -93,25 +99,31 @@ def testSpeed(myFunction):
 		return result
 	return wrapper
 
+
 def countCalls(myFunction):
+	if not TEST_MODE:
+		return myFunction
+
 	@wraps(myFunction)
 	def wrapper(*args, **kwargs):
 		wrapper.count = wrapper.count + 1
+		print(f"{myFunction.__name__} is being called; call count: {wrapper.count}.")
 		result = myFunction(*args, **kwargs)
-		print(f"{myFunction.__name__} has been called {wrapper.count} ")
 		return result
 	wrapper.count = 0
 	return wrapper
+
 
 @testSpeed
 @countCalls
 def countToOneMillion():
 	for i in range(0, 1000000):
 		pass
+	print("Finished counting!")
 
 countToOneMillion()
 countToOneMillion()
 countToOneMillion()
 
-# For more detailed explanations:
+# For more thorough explanations:
 # https://stackoverflow.com/questions/739654/how-do-i-make-function-decorators-and-chain-them-together
